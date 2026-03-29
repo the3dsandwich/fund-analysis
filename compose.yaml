@@ -1,6 +1,6 @@
 services:
   fund-analysis:
-    build: .
+    image: ghcr.io/the3dsandwich/fund-analysis:latest
     ports:
       - "${PORT:-3000}:80"
     environment:
@@ -9,6 +9,20 @@ services:
       - TZ=${TZ:-Asia/Taipei}
     volumes:
       - snapshots:/data/snapshots
+    labels:
+      - com.centurylinklabs.watchtower.scope=fund-analysis
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_SCOPE=fund-analysis
+      - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL:-3600}
+      - WATCHTOWER_CLEANUP=true
+    labels:
+      - com.centurylinklabs.watchtower.scope=fund-analysis
     restart: unless-stopped
 
 volumes:
