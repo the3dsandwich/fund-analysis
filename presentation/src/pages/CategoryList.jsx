@@ -75,9 +75,14 @@ const CategoryList = () => {
                         {rep.fundSizeMillionsUsd != null
                           ? `$${rep.fundSizeMillionsUsd.toLocaleString('en-US')}m`
                           : ''}
-                        {rep.return1Y != null
-                          ? ` | ${rep.return1Y >= 0 ? '+' : ''}${rep.return1Y.toFixed(2)}%`
-                          : ''}
+                        {rep.return1Y != null && (
+                          <>
+                            {' | '}
+                            <span className={rep.return1Y >= 0 ? 'positive' : 'negative'}>
+                              {rep.return1Y >= 0 ? '+' : ''}{rep.return1Y.toFixed(2)}%
+                            </span>
+                          </>
+                        )}
                       </span>
                       {rep.navGraph && (
                         <img
