@@ -1,0 +1,15 @@
+services:
+  fund-analysis:
+    build: .
+    ports:
+      - "${PORT:-3000}:80"
+    environment:
+      - REFRESH_HOUR=${REFRESH_HOUR:-2}
+      - REFRESH_MINUTE=${REFRESH_MINUTE:-0}
+      - TZ=${TZ:-Asia/Taipei}
+    volumes:
+      - snapshots:/data/snapshots
+    restart: unless-stopped
+
+volumes:
+  snapshots:

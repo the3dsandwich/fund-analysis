@@ -1,0 +1,11 @@
+node_modules/
+.env
+
+# Pipeline generated data
+research/fetch-fund-list/data/
+research/scrape-details/data/
+research/merge-output/output/
+
+# Presentation build artifacts
+presentation/src/data.js
+presentation/dist/

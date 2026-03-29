@@ -1,0 +1,15 @@
+node_modules
+.git
+.env
+
+# Research generated data
+research/fetch-fund-list/data
+research/scrape-details/data
+research/merge-output/output
+
+# Presentation build artifacts and node_modules
+presentation/dist
+presentation/node_modules
+
+# Docker volume data
+snapshots
