@@ -19,11 +19,11 @@ const testData = {
       uniqueCount: 3,
       funds: [
         {
-          id: '001', name: '測試基金A', fundSizeMillionsUsd: 18000, return1Y: 9.44,
+          id: '001', name: '\u6e2c\u8a66\u57fa\u91d1A', fundSizeMillionsUsd: 18000, return1Y: 9.44,
           isRepresentative: true,
         },
         {
-          id: '002', name: '測試基金B', fundSizeMillionsUsd: 5000, return1Y: 7.2,
+          id: '002', name: '\u6e2c\u8a66\u57fa\u91d1B', fundSizeMillionsUsd: 5000, return1Y: 7.2,
           isRepresentative: true,
         },
       ],
@@ -34,7 +34,7 @@ const testData = {
       uniqueCount: 1,
       funds: [
         {
-          id: '003', name: '小型基金', fundSizeMillionsUsd: 500, return1Y: -2.1,
+          id: '003', name: '\u5c0f\u578b\u57fa\u91d1', fundSizeMillionsUsd: 500, return1Y: -2.1,
           isRepresentative: true,
         },
       ],
@@ -45,7 +45,7 @@ const testData = {
       uniqueCount: 2,
       funds: [
         {
-          id: '004', name: '全球基金', fundSizeMillionsUsd: 10000, return1Y: 5.5,
+          id: '004', name: '\u5168\u7403\u57fa\u91d1', fundSizeMillionsUsd: 10000, return1Y: 5.5,
           isRepresentative: true,
         },
       ],
@@ -61,6 +61,13 @@ vi.mock('../contexts/DataContext', () => ({
     manifest: { latest: '2026-03-28', snapshots: [{ date: '2026-03-28', category: 'daily' }] },
     loading: false,
     error: null,
+  }),
+}));
+
+vi.mock('../contexts/FavoritesContext', () => ({
+  useFavorites: () => ({
+    isCategoryStarred: () => false,
+    toggleCategory: vi.fn(),
   }),
 }));
 
@@ -92,7 +99,7 @@ describe('CategoryList', () => {
 
   it('shows top representative fund info', () => {
     renderWithRouter();
-    expect(screen.getByText('測試基金A')).toBeInTheDocument();
+    expect(screen.getByText('\u6e2c\u8a66\u57fa\u91d1A')).toBeInTheDocument();
   });
 
   it('flags thin categories', () => {
@@ -105,5 +112,11 @@ describe('CategoryList', () => {
     renderWithRouter();
     const link = screen.getByRole('link', { name: /US Large Cap/ });
     expect(link).toHaveAttribute('href', expect.stringContaining('US%20Large%20Cap'));
+  });
+
+  it('renders star buttons for each category', () => {
+    renderWithRouter();
+    const starBtns = screen.getAllByRole('button', { name: /favorites/i });
+    expect(starBtns.length).toBe(3);
   });
 });

@@ -115,6 +115,61 @@ const extractFundDetails = async (page) => {
   });
 };
 
+const captureNavGraph = async (page) => {
+  try {
+    // Click the 淨值走勢 tab (#tab3)
+    const tab3 = await page.$('a[href="#tab3"], [data-target="#tab3"], #tab3-tab');
+    if (!tab3) {
+      // Try finding by text content
+      const tabs = await page.$$('a[role="tab"], .nav-link, .tab-link');
+      for (const tab of tabs) {
+        const text = await tab.textContent();
+        if (text && text.includes('淨值走勢')) {
+          await tab.click();
+          break;
+        }
+      }
+    } else {
+      await tab3.click();
+    }
+
+    await page.waitForTimeout(1000);
+
+    // Click the "全部" (All) range button
+    const buttons = await page.$$('button, .btn, [role="button"]');
+    for (const btn of buttons) {
+      const text = await btn.textContent();
+      if (text && text.trim() === '全部') {
+        await btn.click();
+        break;
+      }
+    }
+
+    await page.waitForTimeout(2000);
+
+    // Find the chart container — look for canvas, svg, or img near the heading
+    const chartEl = await page.$('.chart-container, .highcharts-container, canvas, svg.highcharts-root');
+    if (chartEl) {
+      const screenshot = await chartEl.screenshot({ type: 'png' });
+      return screenshot.toString('base64');
+    }
+
+    // Fallback: try to find any sizable element in the tab3 area
+    const tab3Content = await page.$('#tab3, [id*="tab3"]');
+    if (tab3Content) {
+      const innerChart = await tab3Content.$('canvas, svg, img[src*="chart"], .chart');
+      if (innerChart) {
+        const screenshot = await innerChart.screenshot({ type: 'png' });
+        return screenshot.toString('base64');
+      }
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 const scrapeFund = async (page, fundId) => {
   const url = FUND_DETAIL_URL + fundId;
   await page.goto(url, { waitUntil: 'networkidle', timeout: PAGE_TIMEOUT });
@@ -138,6 +193,9 @@ const scrapeFund = async (page, fundId) => {
   const details = await extractFundDetails(page);
   details.id = fundId;
   details.scrapedAt = new Date().toISOString();
+
+  // Capture NAV trend graph
+  details.navGraph = await captureNavGraph(page);
 
   return details;
 };

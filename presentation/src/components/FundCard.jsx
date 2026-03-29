@@ -1,3 +1,6 @@
+import StarButton from './StarButton';
+import { useFavorites } from '../contexts/FavoritesContext';
+
 const formatAum = (value) => {
   if (value == null) return '-';
   return `$${value.toLocaleString('en-US')}m`;
@@ -17,10 +20,11 @@ const FUND_DETAIL_URL = 'https://www.cathaybk.com.tw/cathaybk/personal/investmen
 const renderStars = (rating) => {
   if (!rating) return null;
   const filled = Math.round(rating);
-  return '★'.repeat(filled) + '☆'.repeat(5 - filled);
+  return '\u2605'.repeat(filled) + '\u2606'.repeat(5 - filled);
 };
 
 const FundCard = ({ fund, dimmed = false }) => {
+  const { isFundStarred, toggleFund } = useFavorites();
   const r1y = formatReturn(fund.return1Y);
   const ytd = formatReturn(fund.returnYTD);
   const r3m = formatReturn(fund.return3M);
@@ -34,10 +38,21 @@ const FundCard = ({ fund, dimmed = false }) => {
           target="_blank"
           rel="noopener noreferrer"
         >{fund.name}</a>
+        <StarButton
+          starred={isFundStarred(fund.id)}
+          onClick={() => toggleFund(fund.id)}
+        />
         {fund.englishName && (
           <div className="fund-english-name">{fund.englishName}</div>
         )}
       </div>
+      {fund.navGraph && (
+        <img
+          className="nav-graph-thumb"
+          src={`data:image/png;base64,${fund.navGraph}`}
+          alt={`NAV trend for ${fund.name}`}
+        />
+      )}
       <div className="fund-meta">
         <span className="fund-company">{fund.company}</span>
         <span className="fund-aum">{formatAum(fund.fundSizeMillionsUsd)}</span>

@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 import SnapshotPicker from '../components/SnapshotPicker';
 import LoadingState from '../components/LoadingState';
+import StarButton from '../components/StarButton';
 
 const groupByMacro = (categorySummary) => {
   const grouped = [];
@@ -26,6 +28,7 @@ const getTopRep = (data, categoryName) => {
 
 const CategoryList = () => {
   const { data, date, setDate, manifest, loading, error } = useData();
+  const { isCategoryStarred, toggleCategory } = useFavorites();
 
   if (loading || !data) return <LoadingState message={date ? `Loading data for ${date}...` : 'Loading...'} />;
   if (error) return <LoadingState error={error} />;
@@ -56,6 +59,10 @@ const CategoryList = () => {
                 >
                   <div className="category-card-header">
                     <span className="category-name">{cat.name}</span>
+                    <StarButton
+                      starred={isCategoryStarred(cat.name)}
+                      onClick={() => toggleCategory(cat.name)}
+                    />
                     {cat.thin && <span className="thin-badge">thin</span>}
                   </div>
                   <div className="category-counts">
@@ -72,6 +79,13 @@ const CategoryList = () => {
                           ? ` | ${rep.return1Y >= 0 ? '+' : ''}${rep.return1Y.toFixed(2)}%`
                           : ''}
                       </span>
+                      {rep.navGraph && (
+                        <img
+                          className="nav-graph-thumb-xs"
+                          src={`data:image/png;base64,${rep.navGraph}`}
+                          alt={`NAV trend for ${cat.name}`}
+                        />
+                      )}
                     </div>
                   )}
                 </Link>

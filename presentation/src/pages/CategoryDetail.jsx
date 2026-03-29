@@ -1,13 +1,16 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useData } from '../contexts/DataContext';
+import { useFavorites } from '../contexts/FavoritesContext';
 import FundCard from '../components/FundCard';
 import LoadingState from '../components/LoadingState';
+import StarButton from '../components/StarButton';
 
 const CategoryDetail = () => {
   const { name } = useParams();
   const categoryName = decodeURIComponent(name);
   const { data, loading, error } = useData();
+  const { isCategoryStarred, toggleCategory } = useFavorites();
   const [showSiblings, setShowSiblings] = useState(false);
 
   if (loading || !data) return <LoadingState />;
@@ -34,7 +37,13 @@ const CategoryDetail = () => {
   return (
     <div className="container">
       <Link to="/" className="back-link">Back</Link>
-      <h1>{categoryName}</h1>
+      <div className="category-detail-header">
+        <h1>{categoryName}</h1>
+        <StarButton
+          starred={isCategoryStarred(categoryName)}
+          onClick={() => toggleCategory(categoryName)}
+        />
+      </div>
       <div className="category-meta">
         <span className="macro-label">{category.macro}</span>
         <span>{category.uniqueCount} unique / {category.fundCount} total</span>

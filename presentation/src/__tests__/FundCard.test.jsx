@@ -1,17 +1,24 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import FundCard from '../components/FundCard';
+
+vi.mock('../contexts/FavoritesContext', () => ({
+  useFavorites: () => ({
+    isFundStarred: () => false,
+    toggleFund: vi.fn(),
+  }),
+}));
 
 const baseFund = {
   id: '00100001',
-  name: '富蘭克林高成長基金A(acc)',
+  name: '\u5bcc\u862d\u514b\u6797\u9ad8\u6210\u9577\u57fa\u91d1A(acc)',
   englishName: 'Franklin Growth Fund A',
   company: 'Franklin Templeton',
   fundSizeMillionsUsd: 18393,
   return1Y: 9.44,
   returnYTD: -3.70,
   return3M: -3.74,
-  riskLevel: '穩健型',
+  riskLevel: '\u7a69\u5065\u578b',
   starRating: 4,
   currentYield: 8.78,
   isRepresentative: true,
@@ -21,14 +28,14 @@ const baseFund = {
 describe('FundCard', () => {
   it('renders Chinese fund name prominently', () => {
     render(<FundCard fund={baseFund} />);
-    const nameEl = screen.getByText('富蘭克林高成長基金A(acc)');
+    const nameEl = screen.getByText('\u5bcc\u862d\u514b\u6797\u9ad8\u6210\u9577\u57fa\u91d1A(acc)');
     expect(nameEl).toBeInTheDocument();
     expect(nameEl).toHaveClass('fund-name');
   });
 
   it('links fund name to Cathay detail page in new tab', () => {
     render(<FundCard fund={baseFund} />);
-    const link = screen.getByRole('link', { name: /富蘭克林高成長基金A/ });
+    const link = screen.getByRole('link', { name: /\u5bcc\u862d\u514b\u6797\u9ad8\u6210\u9577\u57fa\u91d1A/ });
     expect(link).toHaveAttribute('href', 'https://www.cathaybk.com.tw/cathaybk/personal/investment/fund/details/?fundid=00100001');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
@@ -76,8 +83,7 @@ describe('FundCard', () => {
 
   it('shows star rating with unicode stars', () => {
     render(<FundCard fund={baseFund} />);
-    // 4 stars = 4 filled + 1 empty
-    expect(screen.getByText('★★★★☆')).toBeInTheDocument();
+    expect(screen.getByText('\u2605\u2605\u2605\u2605\u2606')).toBeInTheDocument();
   });
 
   it('shows company name', () => {
@@ -93,7 +99,24 @@ describe('FundCard', () => {
   it('shows dash for yield when not available', () => {
     const fund = { ...baseFund, currentYield: null };
     render(<FundCard fund={fund} />);
-    // Should not crash and should show "-" for yield
     expect(screen.getByTestId('yield')).toHaveTextContent('-');
+  });
+
+  it('renders star toggle button', () => {
+    render(<FundCard fund={baseFund} />);
+    expect(screen.getByRole('button', { name: /favorites/i })).toBeInTheDocument();
+  });
+
+  it('shows NAV graph thumbnail when available', () => {
+    const fund = { ...baseFund, navGraph: 'base64data' };
+    render(<FundCard fund={fund} />);
+    const img = screen.getByAltText(/nav trend/i);
+    expect(img).toHaveAttribute('src', 'data:image/png;base64,base64data');
+    expect(img).toHaveClass('nav-graph-thumb');
+  });
+
+  it('hides NAV graph when not available', () => {
+    render(<FundCard fund={baseFund} />);
+    expect(screen.queryByAltText(/nav trend/i)).not.toBeInTheDocument();
   });
 });
