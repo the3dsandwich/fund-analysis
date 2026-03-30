@@ -5,8 +5,12 @@ REFRESH_HOUR="${REFRESH_HOUR:-2}"
 REFRESH_MINUTE="${REFRESH_MINUTE:-0}"
 
 # Set up cron job for daily refresh
-# Pipe output to both log file and stdout (fd 1 inherited from entrypoint)
-echo "$REFRESH_MINUTE $REFRESH_HOUR * * * /bin/bash /app/docker/refresh.sh 2>&1 | tee -a /var/log/refresh.log" > /etc/cron.d/refresh
+# Pass TZ so cron fires at the configured timezone, not UTC
+{
+  echo "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  echo "TZ=${TZ:-UTC}"
+  echo "$REFRESH_MINUTE $REFRESH_HOUR * * * /bin/bash /app/docker/refresh.sh >> /var/log/refresh.log 2>&1"
+} > /etc/cron.d/refresh
 chmod 0644 /etc/cron.d/refresh
 crontab /etc/cron.d/refresh
 
