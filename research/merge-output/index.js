@@ -97,6 +97,9 @@ const main = () => {
 
       // Holdings from detail page
       holdings: detail.holdings || [],
+
+      // NAV trend graph (base64 PNG screenshot)
+      navGraph: detail.navGraph || null,
     };
 
     merged.push(fund);
