@@ -109,10 +109,11 @@ describe('FundCard', () => {
 
   it('shows NAV graph thumbnail when available', () => {
     const fund = { ...baseFund, navGraph: 'base64data' };
-    render(<FundCard fund={fund} />);
+    const { container } = render(<FundCard fund={fund} />);
     const img = screen.getByAltText(/nav trend/i);
     expect(img).toHaveAttribute('src', 'data:image/png;base64,base64data');
     expect(img).toHaveClass('nav-graph-thumb');
+    expect(container.firstChild).toHaveClass('fund-card-with-graph');
   });
 
   it('hides NAV graph when not available', () => {

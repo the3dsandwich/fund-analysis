@@ -196,6 +196,25 @@ h1 {
   margin-bottom: 8px;
 }
 
+.fund-card-with-graph {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.fund-card-with-graph .fund-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fund-card-with-graph .nav-graph-thumb {
+  width: 240px;
+  height: auto;
+  align-self: center;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
 .fund-card.dimmed {
   opacity: 0.6;
 }
@@ -298,11 +317,8 @@ a.fund-name:hover {
 
 /* NAV graph thumbnails */
 .nav-graph-thumb {
-  width: 200px;
-  height: auto;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  margin-top: 6px;
 }
 
 .nav-graph-thumb-sm {

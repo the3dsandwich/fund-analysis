@@ -30,21 +30,48 @@ const FundCard = ({ fund, dimmed = false }) => {
   const r3m = formatReturn(fund.return3M);
 
   return (
-    <div className={`fund-card${dimmed ? ' dimmed' : ''}`}>
-      <div className="fund-header">
-        <a
-          className="fund-name"
-          href={`${FUND_DETAIL_URL}${fund.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >{fund.name}</a>
-        <StarButton
-          starred={isFundStarred(fund.id)}
-          onClick={() => toggleFund(fund.id)}
-        />
-        {fund.englishName && (
-          <div className="fund-english-name">{fund.englishName}</div>
-        )}
+    <div className={`fund-card${fund.navGraph ? ' fund-card-with-graph' : ''}${dimmed ? ' dimmed' : ''}`}>
+      <div className="fund-card-info">
+        <div className="fund-header">
+          <a
+            className="fund-name"
+            href={`${FUND_DETAIL_URL}${fund.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >{fund.name}</a>
+          <StarButton
+            starred={isFundStarred(fund.id)}
+            onClick={() => toggleFund(fund.id)}
+          />
+          {fund.englishName && (
+            <div className="fund-english-name">{fund.englishName}</div>
+          )}
+        </div>
+        <div className="fund-meta">
+          <span className="fund-company">{fund.company}</span>
+          <span className="fund-aum">{formatAum(fund.fundSizeMillionsUsd)}</span>
+        </div>
+        <div className="fund-returns">
+          <span className="return-item">
+            <span className="return-label">1Y</span>
+            <span className={r1y.className}>{r1y.text}</span>
+          </span>
+          <span className="return-item">
+            <span className="return-label">YTD</span>
+            <span className={ytd.className}>{ytd.text}</span>
+          </span>
+          <span className="return-item">
+            <span className="return-label">3M</span>
+            <span className={r3m.className}>{r3m.text}</span>
+          </span>
+        </div>
+        <div className="fund-details">
+          <span>{fund.riskLevel || '-'}</span>
+          {fund.starRating != null && <span>{renderStars(fund.starRating)}</span>}
+          <span data-testid="yield">
+            {fund.currentYield != null ? `${fund.currentYield.toFixed(2)}%` : '-'}
+          </span>
+        </div>
       </div>
       {fund.navGraph && (
         <img
@@ -53,31 +80,6 @@ const FundCard = ({ fund, dimmed = false }) => {
           alt={`NAV trend for ${fund.name}`}
         />
       )}
-      <div className="fund-meta">
-        <span className="fund-company">{fund.company}</span>
-        <span className="fund-aum">{formatAum(fund.fundSizeMillionsUsd)}</span>
-      </div>
-      <div className="fund-returns">
-        <span className="return-item">
-          <span className="return-label">1Y</span>
-          <span className={r1y.className}>{r1y.text}</span>
-        </span>
-        <span className="return-item">
-          <span className="return-label">YTD</span>
-          <span className={ytd.className}>{ytd.text}</span>
-        </span>
-        <span className="return-item">
-          <span className="return-label">3M</span>
-          <span className={r3m.className}>{r3m.text}</span>
-        </span>
-      </div>
-      <div className="fund-details">
-        <span>{fund.riskLevel || '-'}</span>
-        {fund.starRating != null && <span>{renderStars(fund.starRating)}</span>}
-        <span data-testid="yield">
-          {fund.currentYield != null ? `${fund.currentYield.toFixed(2)}%` : '-'}
-        </span>
-      </div>
     </div>
   );
 };

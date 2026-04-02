@@ -117,51 +117,65 @@ const extractFundDetails = async (page) => {
 
 const captureNavGraph = async (page) => {
   try {
-    // Click the 淨值走勢 tab (#tab3)
-    const tab3 = await page.$('a[href="#tab3"], [data-target="#tab3"], #tab3-tab');
-    if (!tab3) {
-      // Try finding by text content
-      const tabs = await page.$$('a[role="tab"], .nav-link, .tab-link');
-      for (const tab of tabs) {
-        const text = await tab.textContent();
-        if (text && text.includes('淨值走勢')) {
-          await tab.click();
-          break;
-        }
-      }
-    } else {
+    // Click the bottom 淨值走勢 tab (the #tab3 link in the main tab bar)
+    const tab3 = await page.$('a[href="#tab3"]');
+    if (tab3) {
       await tab3.click();
+    } else {
+      return null;
     }
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1500);
 
-    // Click the "全部" (All) range button
-    const buttons = await page.$$('button, .btn, [role="button"]');
-    for (const btn of buttons) {
-      const text = await btn.textContent();
-      if (text && text.trim() === '全部') {
-        await btn.click();
+    // Find the "基金淨值走勢圖" heading, then locate the 5年 button near it
+    // The range buttons are list items inside the chart section, not <button> elements
+    const heading = await page.$('h3');
+    const allHeadings = await page.$$('h3');
+    let chartSection = null;
+    for (const h of allHeadings) {
+      const text = await h.textContent();
+      if (text && text.includes('基金淨值走勢圖')) {
+        // The chart section is the heading's parent container
+        chartSection = await h.evaluateHandle(el => el.closest('div') || el.parentElement);
         break;
+      }
+    }
+
+    if (!chartSection) return null;
+
+    // Click the "5年" range button within the chart section
+    const rangeItems = await chartSection.$$('li');
+    let clicked = false;
+    for (const item of rangeItems) {
+      const text = await item.textContent();
+      if (text && text.trim() === '5年') {
+        await item.click();
+        clicked = true;
+        break;
+      }
+    }
+
+    if (!clicked) {
+      // Fallback: try any clickable element with text "5年" on the page
+      const allClickable = await page.$$('[cursor], [style*="cursor"], li, span');
+      for (const el of allClickable) {
+        const text = await el.textContent();
+        if (text && text.trim() === '5年') {
+          await el.click();
+          break;
+        }
       }
     }
 
     await page.waitForTimeout(2000);
 
-    // Find the chart container — look for canvas, svg, or img near the heading
-    const chartEl = await page.$('.chart-container, .highcharts-container, canvas, svg.highcharts-root');
-    if (chartEl) {
-      const screenshot = await chartEl.screenshot({ type: 'png' });
+    // The chart is rendered as an <img> element inside the chart section
+    // Find the img that's a sibling/descendant of the heading area
+    const parentDiv = await chartSection.evaluateHandle(el => el.parentElement);
+    const chartImg = await parentDiv.$('img');
+    if (chartImg) {
+      const screenshot = await chartImg.screenshot({ type: 'png' });
       return screenshot.toString('base64');
-    }
-
-    // Fallback: try to find any sizable element in the tab3 area
-    const tab3Content = await page.$('#tab3, [id*="tab3"]');
-    if (tab3Content) {
-      const innerChart = await tab3Content.$('canvas, svg, img[src*="chart"], .chart');
-      if (innerChart) {
-        const screenshot = await innerChart.screenshot({ type: 'png' });
-        return screenshot.toString('base64');
-      }
     }
 
     return null;
