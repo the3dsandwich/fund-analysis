@@ -117,7 +117,7 @@ const extractFundDetails = async (page) => {
 
 const captureNavGraph = async (page) => {
   try {
-    // Click the bottom 淨值走勢 tab (the #tab3 link in the main tab bar)
+    // Click the main 淨值走勢 tab (#tab3) in the page tab bar
     const tab3 = await page.$('a[href="#tab3"]');
     if (tab3) {
       await tab3.click();
@@ -127,54 +127,23 @@ const captureNavGraph = async (page) => {
 
     await page.waitForTimeout(1500);
 
-    // Find the "基金淨值走勢圖" heading, then locate the 5年 button near it
-    // The range buttons are list items inside the chart section, not <button> elements
-    const heading = await page.$('h3');
-    const allHeadings = await page.$$('h3');
-    let chartSection = null;
-    for (const h of allHeadings) {
-      const text = await h.textContent();
-      if (text && text.includes('基金淨值走勢圖')) {
-        // The chart section is the heading's parent container
-        chartSection = await h.evaluateHandle(el => el.closest('div') || el.parentElement);
-        break;
-      }
-    }
-
-    if (!chartSection) return null;
-
-    // Click the "5年" range button within the chart section
-    const rangeItems = await chartSection.$$('li');
-    let clicked = false;
-    for (const item of rangeItems) {
-      const text = await item.textContent();
-      if (text && text.trim() === '5年') {
-        await item.click();
-        clicked = true;
-        break;
-      }
-    }
-
-    if (!clicked) {
-      // Fallback: try any clickable element with text "5年" on the page
-      const allClickable = await page.$$('[cursor], [style*="cursor"], li, span');
-      for (const el of allClickable) {
-        const text = await el.textContent();
-        if (text && text.trim() === '5年') {
-          await el.click();
-          break;
-        }
-      }
+    // Click the 5年 duration button (radio input via its label)
+    // The visible duration group in tab3 uses name="duration__lineChart__04"
+    const label5y = await page.$('label[for="duration_lineChart__04_05"]');
+    if (label5y) {
+      await label5y.click();
+    } else {
+      // Fallback: click the input directly
+      const input5y = await page.$('#duration_lineChart__04_05');
+      if (input5y) await input5y.click();
     }
 
     await page.waitForTimeout(2000);
 
-    // The chart is rendered as an <img> element inside the chart section
-    // Find the img that's a sibling/descendant of the heading area
-    const parentDiv = await chartSection.evaluateHandle(el => el.parentElement);
-    const chartImg = await parentDiv.$('img');
-    if (chartImg) {
-      const screenshot = await chartImg.screenshot({ type: 'png' });
+    // The NAV chart is a Highcharts SVG rendered inside #navChart
+    const navChart = await page.$('#navChart');
+    if (navChart) {
+      const screenshot = await navChart.screenshot({ type: 'png' });
       return screenshot.toString('base64');
     }
 
