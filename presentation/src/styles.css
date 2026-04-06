@@ -296,12 +296,24 @@ a.fund-name:hover {
   color: #f59e0b;
 }
 
-/* NAV graph thumbnails — unified stacked layout */
+/* NAV graph thumbnails — right-side flex layout */
+.fund-card.has-graph,
+.category-card.has-graph {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.fund-card.has-graph .fund-card-info,
+.category-card.has-graph .category-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .nav-graph-thumb {
-  display: block;
-  width: 160px;
+  width: 200px;
   height: auto;
-  margin-top: 6px;
+  flex-shrink: 0;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   cursor: zoom-in;

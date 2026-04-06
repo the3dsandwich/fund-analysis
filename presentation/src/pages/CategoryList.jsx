@@ -56,42 +56,44 @@ const CategoryList = () => {
                 <Link
                   key={cat.name}
                   to={`/category/${encodeURIComponent(cat.name)}`}
-                  className={`category-card${cat.thin ? ' thin' : ''}`}
+                  className={`category-card${cat.thin ? ' thin' : ''}${rep?.navGraph ? ' has-graph' : ''}`}
                 >
-                  <div className="category-card-header">
-                    <span className="category-name">{cat.name}</span>
-                    <StarButton
-                      starred={isCategoryStarred(cat.name)}
-                      onClick={() => toggleCategory(cat.name)}
-                    />
-                    {cat.thin && <span className="thin-badge">thin</span>}
-                  </div>
-                  <div className="category-counts">
-                    {cat.uniqueCount} unique / {cat.fundCount} total
-                  </div>
-                  {rep && (
-                    <div className="category-rep">
-                      <span className="rep-name">{rep.name}</span>
-                      <span className="rep-stats">
-                        {rep.fundSizeMillionsUsd != null
-                          ? `$${rep.fundSizeMillionsUsd.toLocaleString('en-US')}m`
-                          : ''}
-                        {rep.return1Y != null && (
-                          <>
-                            {' | '}
-                            <span className={rep.return1Y >= 0 ? 'positive' : 'negative'}>
-                              {rep.return1Y >= 0 ? '+' : ''}{rep.return1Y.toFixed(2)}%
-                            </span>
-                          </>
-                        )}
-                      </span>
-                      {rep.navGraph && (
-                        <NavGraphThumb
-                          base64={rep.navGraph}
-                          alt={`NAV trend for ${cat.name}`}
-                        />
-                      )}
+                  <div className="category-card-main">
+                    <div className="category-card-header">
+                      <span className="category-name">{cat.name}</span>
+                      <StarButton
+                        starred={isCategoryStarred(cat.name)}
+                        onClick={() => toggleCategory(cat.name)}
+                      />
+                      {cat.thin && <span className="thin-badge">thin</span>}
                     </div>
+                    <div className="category-counts">
+                      {cat.uniqueCount} unique / {cat.fundCount} total
+                    </div>
+                    {rep && (
+                      <div className="category-rep">
+                        <span className="rep-name">{rep.name}</span>
+                        <span className="rep-stats">
+                          {rep.fundSizeMillionsUsd != null
+                            ? `$${rep.fundSizeMillionsUsd.toLocaleString('en-US')}m`
+                            : ''}
+                          {rep.return1Y != null && (
+                            <>
+                              {' | '}
+                              <span className={rep.return1Y >= 0 ? 'positive' : 'negative'}>
+                                {rep.return1Y >= 0 ? '+' : ''}{rep.return1Y.toFixed(2)}%
+                              </span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {rep?.navGraph && (
+                    <NavGraphThumb
+                      base64={rep.navGraph}
+                      alt={`NAV trend for ${cat.name}`}
+                    />
                   )}
                 </Link>
               );

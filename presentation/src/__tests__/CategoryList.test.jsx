@@ -20,7 +20,7 @@ const testData = {
       funds: [
         {
           id: '001', name: '\u6e2c\u8a66\u57fa\u91d1A', fundSizeMillionsUsd: 18000, return1Y: 9.44,
-          isRepresentative: true,
+          isRepresentative: true, navGraph: 'repgraphbase64',
         },
         {
           id: '002', name: '\u6e2c\u8a66\u57fa\u91d1B', fundSizeMillionsUsd: 5000, return1Y: 7.2,
@@ -112,6 +112,16 @@ describe('CategoryList', () => {
     renderWithRouter();
     const link = screen.getByRole('link', { name: /US Large Cap/ });
     expect(link).toHaveAttribute('href', expect.stringContaining('US%20Large%20Cap'));
+  });
+
+  it('renders rep fund NAV graph as direct child of category card link with has-graph class', () => {
+    renderWithRouter();
+    const link = screen.getByRole('link', { name: /US Large Cap/ });
+    expect(link).toHaveClass('has-graph');
+    const img = screen.getByAltText('NAV trend for US Large Cap');
+    expect(img).toHaveAttribute('src', 'data:image/png;base64,repgraphbase64');
+    // Chart is a direct child of the link, not inside .category-rep
+    expect(img.parentElement).toBe(link);
   });
 
   it('renders star buttons for each category', () => {

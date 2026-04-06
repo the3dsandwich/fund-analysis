@@ -31,7 +31,7 @@ const FundCard = ({ fund, dimmed = false }) => {
   const r3m = formatReturn(fund.return3M);
 
   return (
-    <div className={`fund-card${dimmed ? ' dimmed' : ''}`}>
+    <div className={`fund-card${dimmed ? ' dimmed' : ''}${fund.navGraph ? ' has-graph' : ''}`}>
       <div className="fund-card-info">
         <div className="fund-header">
           <a
