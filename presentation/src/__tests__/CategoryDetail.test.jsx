@@ -40,6 +40,7 @@ vi.mock('../contexts/DataContext', () => ({
         },
       },
     },
+    manifest: { latest: '2026-03-28', snapshots: [{ date: '2026-03-28', category: 'daily' }] },
     loading: false,
     error: null,
   }),
@@ -55,9 +56,9 @@ vi.mock('../contexts/FavoritesContext', () => ({
 }));
 
 const renderWithRoute = (categoryName = 'US Large Cap') => render(
-  <MemoryRouter initialEntries={[`/category/${encodeURIComponent(categoryName)}`]}>
+  <MemoryRouter initialEntries={[`/2026-03-28/category/${encodeURIComponent(categoryName)}`]}>
     <Routes>
-      <Route path="/category/:name" element={<CategoryDetail />} />
+      <Route path="/:date/category/:name" element={<CategoryDetail />} />
     </Routes>
   </MemoryRouter>
 );
@@ -88,10 +89,10 @@ describe('CategoryDetail', () => {
     expect(screen.getByText('\u540c\u985e\u57fa\u91d1D(\u907f\u96aa)')).toBeInTheDocument();
   });
 
-  it('shows back link to home', () => {
+  it('shows back link to date root', () => {
     renderWithRoute();
     const backLink = screen.getByRole('link', { name: /back/i });
-    expect(backLink).toHaveAttribute('href', '/');
+    expect(backLink).toHaveAttribute('href', '/2026-03-28');
   });
 
   it('shows macro label', () => {

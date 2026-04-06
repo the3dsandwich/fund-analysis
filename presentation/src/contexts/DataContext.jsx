@@ -12,30 +12,20 @@ export const DataProvider = ({ children }) => {
   const [manifest, setManifest] = useState(null);
   const [date, setDateState] = useState(null);
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const cache = useRef({});
 
-  // Fetch manifest on mount
+  // Fetch manifest on mount. The URL (via DateGate) drives which
+  // snapshot actually loads — manifest is only used for picker + redirect.
   useEffect(() => {
     fetch('/snapshots/manifest.json')
       .then(res => {
         if (!res.ok) throw new Error('Data is not available yet. The first refresh may still be running.');
         return res.json();
       })
-      .then(m => {
-        setManifest(m);
-        if (m.latest) {
-          setDateState(m.latest);
-        } else {
-          setLoading(false);
-          setError('No snapshots available.');
-        }
-      })
-      .catch(err => {
-        setLoading(false);
-        setError(err.message || 'Failed to load manifest.');
-      });
+      .then(m => setManifest(m))
+      .catch(err => setError(err.message || 'Failed to load manifest.'));
   }, []);
 
   // Fetch snapshot when date changes

@@ -3,25 +3,22 @@ import { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import FundCard from '../components/FundCard';
-import LoadingState from '../components/LoadingState';
+import SnapshotPicker from '../components/SnapshotPicker';
 import StarButton from '../components/StarButton';
 
 const CategoryDetail = () => {
-  const { name } = useParams();
+  const { date, name } = useParams();
   const categoryName = decodeURIComponent(name);
-  const { data, loading, error } = useData();
+  const { data, manifest } = useData();
   const { isCategoryStarred, toggleCategory } = useFavorites();
   const [showSiblings, setShowSiblings] = useState(false);
-
-  if (loading || !data) return <LoadingState />;
-  if (error) return <LoadingState error={error} />;
 
   const category = data.categories[categoryName];
 
   if (!category) {
     return (
       <div className="container">
-        <Link to="/">Back</Link>
+        <Link to={`/${date}`}>Back</Link>
         <h1>Category not found</h1>
         <p>No category named "{categoryName}"</p>
       </div>
@@ -36,7 +33,10 @@ const CategoryDetail = () => {
 
   return (
     <div className="container">
-      <Link to="/" className="back-link">Back</Link>
+      <div className="page-header">
+        <Link to={`/${date}`} className="back-link">Back</Link>
+        <SnapshotPicker manifest={manifest} date={date} />
+      </div>
       <div className="category-detail-header">
         <h1>{categoryName}</h1>
         <StarButton

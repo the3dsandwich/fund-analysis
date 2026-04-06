@@ -35,6 +35,8 @@ const mockData = {
       },
     },
   },
+  date: '2026-03-28',
+  manifest: { latest: '2026-03-28' },
   loading: false,
   error: null,
 };
@@ -62,15 +64,15 @@ describe('Sidebar', () => {
     mockFavorites.starredFunds = [];
     renderSidebar();
     const link = screen.getByRole('link', { name: /US Large Cap/ });
-    expect(link).toHaveAttribute('href', expect.stringContaining('US%20Large%20Cap'));
+    expect(link).toHaveAttribute('href', '/2026-03-28/category/US%20Large%20Cap');
   });
 
-  it('shows starred fund as a link to its category', () => {
+  it('shows starred fund as a link to its category with date prefix', () => {
     mockFavorites.starredCategories = [];
     mockFavorites.starredFunds = ['001'];
     renderSidebar();
     const link = screen.getByRole('link', { name: /Test Fund A/ });
-    expect(link).toHaveAttribute('href', expect.stringContaining('US%20Large%20Cap'));
+    expect(link).toHaveAttribute('href', '/2026-03-28/category/US%20Large%20Cap');
   });
 
   it('does NOT show NAV graph for starred fund (compact view)', () => {

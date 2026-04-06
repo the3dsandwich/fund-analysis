@@ -37,13 +37,15 @@ const Return3M = ({ value }) => {
 
 const SidebarContent = () => {
   const { starredCategories, starredFunds } = useFavorites();
-  const { data } = useData();
+  const { data, date, manifest } = useData();
+  const effectiveDate = date || manifest?.latest;
 
   const isEmpty = starredCategories.length === 0 && starredFunds.length === 0;
 
   if (isEmpty) {
     return <p className="sidebar-empty">Star categories or funds for quick access</p>;
   }
+  if (!effectiveDate) return null;
 
   return (
     <>
@@ -55,7 +57,7 @@ const SidebarContent = () => {
             return (
               <Link
                 key={name}
-                to={`/category/${encodeURIComponent(name)}`}
+                to={`/${effectiveDate}/category/${encodeURIComponent(name)}`}
                 className="sidebar-compact-link"
               >
                 <span className="sidebar-compact-name">{name}</span>
@@ -75,7 +77,7 @@ const SidebarContent = () => {
             return (
               <Link
                 key={id}
-                to={`/category/${encodeURIComponent(categoryName)}`}
+                to={`/${effectiveDate}/category/${encodeURIComponent(categoryName)}`}
                 className="sidebar-compact-link"
               >
                 <span className="sidebar-compact-name">{fund.name}</span>

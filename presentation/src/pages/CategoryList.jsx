@@ -1,8 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import SnapshotPicker from '../components/SnapshotPicker';
-import LoadingState from '../components/LoadingState';
 import StarButton from '../components/StarButton';
 import NavGraphThumb from '../components/NavGraphThumb';
 
@@ -28,11 +27,9 @@ const getTopRep = (data, categoryName) => {
 };
 
 const CategoryList = () => {
-  const { data, date, setDate, manifest, loading, error } = useData();
+  const { date } = useParams();
+  const { data, manifest } = useData();
   const { isCategoryStarred, toggleCategory } = useFavorites();
-
-  if (loading || !data) return <LoadingState message={date ? `Loading data for ${date}...` : 'Loading...'} />;
-  if (error) return <LoadingState error={error} />;
 
   const groups = groupByMacro(data.categorySummary);
 
@@ -40,7 +37,7 @@ const CategoryList = () => {
     <div className="container">
       <div className="page-header">
         <h1>Fund Categories</h1>
-        <SnapshotPicker manifest={manifest} date={date} onDateChange={setDate} />
+        <SnapshotPicker manifest={manifest} date={date} />
       </div>
       <p className="subtitle">
         {data.totalUnique} unique funds across {data.categorySummary.length} categories
@@ -55,7 +52,7 @@ const CategoryList = () => {
               return (
                 <Link
                   key={cat.name}
-                  to={`/category/${encodeURIComponent(cat.name)}`}
+                  to={`/${date}/category/${encodeURIComponent(cat.name)}`}
                   className={`category-card${cat.thin ? ' thin' : ''}${rep?.navGraph ? ' has-graph' : ''}`}
                 >
                   <div className="category-card-main">

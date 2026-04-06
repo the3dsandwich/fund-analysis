@@ -1,4 +1,9 @@
-const SnapshotPicker = ({ manifest, date, onDateChange }) => {
+import { useNavigate, useParams } from 'react-router-dom';
+
+const SnapshotPicker = ({ manifest, date }) => {
+  const navigate = useNavigate();
+  const { name } = useParams();
+
   if (!manifest?.snapshots?.length) return null;
 
   const groups = {};
@@ -10,11 +15,20 @@ const SnapshotPicker = ({ manifest, date, onDateChange }) => {
   const labels = { daily: 'Recent', weekly: 'Weekly', monthly: 'Monthly' };
   const order = ['daily', 'weekly', 'monthly'];
 
+  const handleChange = (e) => {
+    const newDate = e.target.value;
+    if (name) {
+      navigate(`/${newDate}/category/${encodeURIComponent(name)}`);
+    } else {
+      navigate(`/${newDate}`);
+    }
+  };
+
   return (
     <select
       className="snapshot-picker"
-      value={date}
-      onChange={(e) => onDateChange(e.target.value)}
+      value={date || ''}
+      onChange={handleChange}
     >
       {order.map(cat =>
         groups[cat] ? (

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import CategoryList from '../pages/CategoryList';
 
@@ -72,8 +72,10 @@ vi.mock('../contexts/FavoritesContext', () => ({
 }));
 
 const renderWithRouter = () => render(
-  <MemoryRouter>
-    <CategoryList />
+  <MemoryRouter initialEntries={['/2026-03-28']}>
+    <Routes>
+      <Route path="/:date" element={<CategoryList />} />
+    </Routes>
   </MemoryRouter>
 );
 
@@ -108,10 +110,10 @@ describe('CategoryList', () => {
     expect(thinBadges.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('category cards link to correct routes', () => {
+  it('category cards link to correct routes with date prefix', () => {
     renderWithRouter();
     const link = screen.getByRole('link', { name: /US Large Cap/ });
-    expect(link).toHaveAttribute('href', expect.stringContaining('US%20Large%20Cap'));
+    expect(link).toHaveAttribute('href', '/2026-03-28/category/US%20Large%20Cap');
   });
 
   it('renders rep fund NAV graph as direct child of category card link with has-graph class', () => {
