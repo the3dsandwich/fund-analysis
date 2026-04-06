@@ -1,4 +1,5 @@
 import StarButton from './StarButton';
+import NavGraphThumb from './NavGraphThumb';
 import { useFavorites } from '../contexts/FavoritesContext';
 
 const formatAum = (value) => {
@@ -30,7 +31,7 @@ const FundCard = ({ fund, dimmed = false }) => {
   const r3m = formatReturn(fund.return3M);
 
   return (
-    <div className={`fund-card${fund.navGraph ? ' fund-card-with-graph' : ''}${dimmed ? ' dimmed' : ''}`}>
+    <div className={`fund-card${dimmed ? ' dimmed' : ''}`}>
       <div className="fund-card-info">
         <div className="fund-header">
           <a
@@ -74,9 +75,8 @@ const FundCard = ({ fund, dimmed = false }) => {
         </div>
       </div>
       {fund.navGraph && (
-        <img
-          className="nav-graph-thumb"
-          src={`data:image/png;base64,${fund.navGraph}`}
+        <NavGraphThumb
+          base64={fund.navGraph}
           alt={`NAV trend for ${fund.name}`}
         />
       )}

@@ -113,7 +113,8 @@ describe('FundCard', () => {
     const img = screen.getByAltText(/nav trend/i);
     expect(img).toHaveAttribute('src', 'data:image/png;base64,base64data');
     expect(img).toHaveClass('nav-graph-thumb');
-    expect(container.firstChild).toHaveClass('fund-card-with-graph');
+    // Stacked layout: no side-by-side flex wrapper class
+    expect(container.firstChild).not.toHaveClass('fund-card-with-graph');
   });
 
   it('hides NAV graph when not available', () => {

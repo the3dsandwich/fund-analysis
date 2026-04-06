@@ -12,6 +12,29 @@ const findFundById = (data, fundId) => {
   return null;
 };
 
+const getTopRep = (data, categoryName) => {
+  const cat = data?.categories?.[categoryName];
+  if (!cat) return null;
+  return cat.funds
+    .filter(f => f.isRepresentative)
+    .sort((a, b) => (b.fundSizeMillionsUsd || 0) - (a.fundSizeMillionsUsd || 0))[0] || null;
+};
+
+const formatReturn = (value) => {
+  if (value == null) return null;
+  const sign = value >= 0 ? '+' : '';
+  return {
+    text: `${sign}${value.toFixed(2)}%`,
+    className: value >= 0 ? 'positive' : 'negative',
+  };
+};
+
+const Return3M = ({ value }) => {
+  const r = formatReturn(value);
+  if (!r) return <span className="sidebar-return-3m">-</span>;
+  return <span className={`sidebar-return-3m ${r.className}`}>{r.text}</span>;
+};
+
 const SidebarContent = () => {
   const { starredCategories, starredFunds } = useFavorites();
   const { data } = useData();
@@ -27,15 +50,19 @@ const SidebarContent = () => {
       {starredCategories.length > 0 && (
         <div className="sidebar-section">
           <h3 className="sidebar-section-title">Categories</h3>
-          {starredCategories.map(name => (
-            <Link
-              key={name}
-              to={`/category/${encodeURIComponent(name)}`}
-              className="sidebar-cat-link"
-            >
-              {name} <span className="sidebar-arrow">&rsaquo;</span>
-            </Link>
-          ))}
+          {starredCategories.map(name => {
+            const rep = getTopRep(data, name);
+            return (
+              <Link
+                key={name}
+                to={`/category/${encodeURIComponent(name)}`}
+                className="sidebar-compact-link"
+              >
+                <span className="sidebar-compact-name">{name}</span>
+                <Return3M value={rep?.return3M} />
+              </Link>
+            );
+          })}
         </div>
       )}
       {starredFunds.length > 0 && (
@@ -49,19 +76,10 @@ const SidebarContent = () => {
               <Link
                 key={id}
                 to={`/category/${encodeURIComponent(categoryName)}`}
-                className="sidebar-fund"
+                className="sidebar-compact-link"
               >
-                <span className="sidebar-fund-name">{fund.name}</span>
-                {fund.navGraph && (
-                  <img
-                    className="nav-graph-thumb-sm"
-                    src={`data:image/png;base64,${fund.navGraph}`}
-                    alt={`NAV trend for ${fund.name}`}
-                  />
-                )}
-                {fund.nav != null && (
-                  <span className="sidebar-fund-nav">NAV: {fund.nav}</span>
-                )}
+                <span className="sidebar-compact-name">{fund.name}</span>
+                <Return3M value={fund.return3M} />
               </Link>
             );
           })}

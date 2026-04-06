@@ -22,7 +22,15 @@ const mockData = {
       'US Large Cap': {
         macro: 'Equity - US',
         funds: [
-          { id: '001', name: 'Test Fund A', nav: 45.32, navGraph: 'abc123base64', isRepresentative: true },
+          {
+            id: '001',
+            name: 'Test Fund A',
+            nav: 45.32,
+            navGraph: 'abc123base64',
+            isRepresentative: true,
+            fundSizeMillionsUsd: 10000,
+            return3M: 2.34,
+          },
         ],
       },
     },
@@ -65,11 +73,26 @@ describe('Sidebar', () => {
     expect(link).toHaveAttribute('href', expect.stringContaining('US%20Large%20Cap'));
   });
 
-  it('shows NAV graph thumbnail for starred fund', () => {
+  it('does NOT show NAV graph for starred fund (compact view)', () => {
     mockFavorites.starredCategories = [];
     mockFavorites.starredFunds = ['001'];
     renderSidebar();
-    const img = screen.getByAltText(/nav trend/i);
-    expect(img).toHaveAttribute('src', 'data:image/png;base64,abc123base64');
+    expect(screen.queryByAltText(/nav trend/i)).not.toBeInTheDocument();
+  });
+
+  it('shows 3M return for starred fund with color class', () => {
+    mockFavorites.starredCategories = [];
+    mockFavorites.starredFunds = ['001'];
+    renderSidebar();
+    const el = screen.getByText('+2.34%');
+    expect(el).toHaveClass('positive');
+  });
+
+  it('shows 3M return of top rep for starred category', () => {
+    mockFavorites.starredCategories = ['US Large Cap'];
+    mockFavorites.starredFunds = [];
+    renderSidebar();
+    const el = screen.getByText('+2.34%');
+    expect(el).toHaveClass('positive');
   });
 });

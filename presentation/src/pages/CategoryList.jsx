@@ -4,6 +4,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import SnapshotPicker from '../components/SnapshotPicker';
 import LoadingState from '../components/LoadingState';
 import StarButton from '../components/StarButton';
+import NavGraphThumb from '../components/NavGraphThumb';
 
 const groupByMacro = (categorySummary) => {
   const grouped = [];
@@ -85,9 +86,8 @@ const CategoryList = () => {
                         )}
                       </span>
                       {rep.navGraph && (
-                        <img
-                          className="nav-graph-thumb-xs"
-                          src={`data:image/png;base64,${rep.navGraph}`}
+                        <NavGraphThumb
+                          base64={rep.navGraph}
                           alt={`NAV trend for ${cat.name}`}
                         />
                       )}

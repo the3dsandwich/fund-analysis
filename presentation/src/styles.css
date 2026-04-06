@@ -196,25 +196,6 @@ h1 {
   margin-bottom: 8px;
 }
 
-.fund-card-with-graph {
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-}
-
-.fund-card-with-graph .fund-card-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.fund-card-with-graph .nav-graph-thumb {
-  width: 240px;
-  height: auto;
-  align-self: center;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-
 .fund-card.dimmed {
   opacity: 0.6;
 }
@@ -315,24 +296,42 @@ a.fund-name:hover {
   color: #f59e0b;
 }
 
-/* NAV graph thumbnails */
+/* NAV graph thumbnails — unified stacked layout */
 .nav-graph-thumb {
+  display: block;
+  width: 160px;
+  height: auto;
+  margin-top: 6px;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  cursor: zoom-in;
 }
 
-.nav-graph-thumb-sm {
-  width: 120px;
-  height: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 3px;
+.nav-graph-thumb:hover {
+  border-color: #999;
 }
 
-.nav-graph-thumb-xs {
-  width: 100px;
+/* NAV graph modal */
+.nav-graph-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  cursor: zoom-out;
+  padding: 24px;
+}
+
+.nav-graph-modal-image {
+  max-width: min(80vw, 900px);
+  max-height: 85vh;
+  width: auto;
   height: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 3px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 /* Sidebar */
@@ -373,10 +372,12 @@ a.fund-name:hover {
   margin-bottom: 6px;
 }
 
-.sidebar-cat-link {
+/* Compact starred item — used for both starred categories and funds */
+.sidebar-compact-link {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   padding: 6px 8px;
   text-decoration: none;
   color: inherit;
@@ -384,42 +385,22 @@ a.fund-name:hover {
   border-radius: 4px;
 }
 
-.sidebar-cat-link:hover {
+.sidebar-compact-link:hover {
   background: #f0f0f0;
 }
 
-.sidebar-arrow {
-  color: #999;
+.sidebar-compact-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.sidebar-fund {
-  display: block;
-  padding: 8px;
-  border-bottom: 1px solid #f0f0f0;
-  text-decoration: none;
-  color: inherit;
-  border-radius: 4px;
-}
-
-.sidebar-fund:hover {
-  background: #f0f0f0;
-}
-
-.sidebar-fund:last-child {
-  border-bottom: none;
-}
-
-.sidebar-fund-name {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.sidebar-fund-nav {
-  display: block;
+.sidebar-return-3m {
+  flex-shrink: 0;
   font-size: 0.8rem;
-  color: #888;
-  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Mobile: floating star button + drawer */
