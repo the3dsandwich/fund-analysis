@@ -18,6 +18,11 @@ vi.mock('../contexts/FavoritesContext', () => ({
 
 const mockData = {
   data: {
+    categorySummary: [
+      { name: 'US Large Cap', macro: 'Equity - US' },
+      { name: 'Global Equity', macro: 'Equity - Global' },
+      { name: 'Asia Bonds', macro: 'Bond - Asia' },
+    ],
     categories: {
       'US Large Cap': {
         macro: 'Equity - US',
@@ -25,11 +30,44 @@ const mockData = {
           {
             id: '001',
             name: 'Test Fund A',
-            nav: 45.32,
+            company: 'Vanguard',
             navGraph: 'abc123base64',
             isRepresentative: true,
             fundSizeMillionsUsd: 10000,
             return3M: 2.34,
+          },
+          {
+            id: '002',
+            name: 'Test Fund B',
+            company: 'BlackRock',
+            isRepresentative: false,
+            return3M: 1.0,
+          },
+        ],
+      },
+      'Global Equity': {
+        macro: 'Equity - Global',
+        funds: [
+          {
+            id: '010',
+            name: 'Global Fund',
+            company: 'Fidelity',
+            isRepresentative: true,
+            fundSizeMillionsUsd: 5000,
+            return3M: -0.5,
+          },
+        ],
+      },
+      'Asia Bonds': {
+        macro: 'Bond - Asia',
+        funds: [
+          {
+            id: '020',
+            name: 'Asia Bond Fund',
+            company: 'PIMCO',
+            isRepresentative: true,
+            fundSizeMillionsUsd: 3000,
+            return3M: 0.2,
           },
         ],
       },
@@ -96,5 +134,30 @@ describe('Sidebar', () => {
     renderSidebar();
     const el = screen.getByText('+2.34%');
     expect(el).toHaveClass('positive');
+  });
+
+  it('sorts starred categories to match main page (categorySummary) order', () => {
+    mockFavorites.starredCategories = ['Asia Bonds', 'US Large Cap', 'Global Equity'];
+    mockFavorites.starredFunds = [];
+    renderSidebar();
+    const links = screen.getAllByRole('link').map(a => a.textContent);
+    const order = links.map(t => ['US Large Cap', 'Global Equity', 'Asia Bonds'].find(n => t.startsWith(n)));
+    expect(order).toEqual(['US Large Cap', 'Global Equity', 'Asia Bonds']);
+  });
+
+  it('sorts starred funds by category order then by company name', () => {
+    // 010 = Global Equity / Fidelity
+    // 020 = Asia Bonds / PIMCO
+    // 002 = US Large Cap / BlackRock
+    // 001 = US Large Cap / Vanguard
+    mockFavorites.starredCategories = [];
+    mockFavorites.starredFunds = ['010', '020', '002', '001'];
+    renderSidebar();
+    const names = screen.getAllByRole('link').map(a => a.textContent);
+    // US Large Cap first (BlackRock < Vanguard), then Global Equity, then Asia Bonds
+    expect(names[0]).toContain('Test Fund B');
+    expect(names[1]).toContain('Test Fund A');
+    expect(names[2]).toContain('Global Fund');
+    expect(names[3]).toContain('Asia Bond Fund');
   });
 });

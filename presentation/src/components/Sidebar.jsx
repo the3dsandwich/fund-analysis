@@ -47,12 +47,31 @@ const SidebarContent = () => {
   }
   if (!effectiveDate) return null;
 
+  // Order categories to match the main page (categorySummary order).
+  const categoryOrder = new Map(
+    (data?.categorySummary || []).map((c, i) => [c.name, i])
+  );
+  const orderOf = (name) => categoryOrder.get(name) ?? Number.MAX_SAFE_INTEGER;
+
+  const sortedCategories = [...starredCategories].sort(
+    (a, b) => orderOf(a) - orderOf(b)
+  );
+
+  const fundEntries = starredFunds
+    .map(id => findFundById(data, id))
+    .filter(Boolean)
+    .sort((a, b) => {
+      const catDiff = orderOf(a.categoryName) - orderOf(b.categoryName);
+      if (catDiff !== 0) return catDiff;
+      return (a.fund.company || '').localeCompare(b.fund.company || '');
+    });
+
   return (
     <>
       {starredCategories.length > 0 && (
         <div className="sidebar-section">
           <h3 className="sidebar-section-title">Categories</h3>
-          {starredCategories.map(name => {
+          {sortedCategories.map(name => {
             const rep = getTopRep(data, name);
             return (
               <Link
@@ -70,13 +89,10 @@ const SidebarContent = () => {
       {starredFunds.length > 0 && (
         <div className="sidebar-section">
           <h3 className="sidebar-section-title">Funds</h3>
-          {starredFunds.map(id => {
-            const result = findFundById(data, id);
-            if (!result) return null;
-            const { fund, categoryName } = result;
+          {fundEntries.map(({ fund, categoryName }) => {
             return (
               <Link
-                key={id}
+                key={fund.id}
                 to={`/${effectiveDate}/category/${encodeURIComponent(categoryName)}`}
                 className="sidebar-compact-link"
               >
