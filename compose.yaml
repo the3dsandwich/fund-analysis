@@ -14,13 +14,16 @@ services:
     restart: unless-stopped
 
   watchtower:
-    image: containrrr/watchtower
+    image: containrrr/watchtower:1.7.1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - WATCHTOWER_SCOPE=fund-analysis
       - WATCHTOWER_POLL_INTERVAL=${WATCHTOWER_POLL_INTERVAL:-3600}
       - WATCHTOWER_CLEANUP=true
+      # Watchtower 1.7.1 negotiates Docker API v1.25 by default, which Docker
+      # Engine 26+ rejects (minimum is v1.44). Pinning here bypasses negotiation.
+      - DOCKER_API_VERSION=1.44
     labels:
       - com.centurylinklabs.watchtower.scope=fund-analysis
     restart: unless-stopped
