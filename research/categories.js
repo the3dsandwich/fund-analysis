@@ -113,18 +113,19 @@ const categorize = (morningstarCategory, investmentRegion) => {
   }
 
   // --- Sector equity (check first -- most specific) ---
-  if (cat.includes('產業股票 - 科技')) return findCategory('Sector - Technology');
-  if (cat.includes('產業股票 - 健康護理')) return findCategory('Sector - Healthcare');
-  if (cat.includes('產業股票 - 生物科技')) return findCategory('Sector - Biotech');
-  if (cat.includes('產業股票 - 貴金屬')) return findCategory('Sector - Gold & Precious Metals');
-  if (cat.includes('產業股票 - 天然資源')) return findCategory('Sector - Natural Resources & Mining');
-  if (cat.includes('產業股票 - 能源')) return findCategory('Sector - Energy');
-  if (cat.includes('產業股票 - 環境生態') || cat.includes('產業股票 - 替代能源')) return findCategory('Sector - Clean Energy & ESG');
-  if (cat.includes('產業股票 - 消費品')) return findCategory('Sector - Consumer & Brands');
-  if (cat.includes('產業股票 - 金融服務')) return findCategory('Sector - Financials');
-  if (cat.includes('產業股票 - 公用事業')) return findCategory('Sector - Utilities');
-  if (cat.includes('產業股票 - 基礎建設')) return findCategory('Sector - Infrastructure');
-  if (cat.includes('產業股票 - 農產品')) return findCategory('Sector - Agriculture');
+  // Morningstar renamed 產業股票 → 行業股票 and dropped spaces around hyphen in ~May 2026
+  if (cat.includes('產業股票 - 科技') || cat.includes('行業股票-科技')) return findCategory('Sector - Technology');
+  if (cat.includes('產業股票 - 健康護理') || cat.includes('行業股票-健康護理')) return findCategory('Sector - Healthcare');
+  if (cat.includes('產業股票 - 生物科技') || cat.includes('行業股票-生物科技')) return findCategory('Sector - Biotech');
+  if (cat.includes('產業股票 - 貴金屬') || cat.includes('行業股票-貴金屬')) return findCategory('Sector - Gold & Precious Metals');
+  if (cat.includes('產業股票 - 天然資源') || cat.includes('行業股票-天然資源')) return findCategory('Sector - Natural Resources & Mining');
+  if (cat.includes('產業股票 - 能源') || cat.includes('行業股票-能源')) return findCategory('Sector - Energy');
+  if (cat.includes('產業股票 - 環境生態') || cat.includes('產業股票 - 替代能源') || cat.includes('行業股票-環境生態') || cat.includes('行業股票-替代能源')) return findCategory('Sector - Clean Energy & ESG');
+  if (cat.includes('產業股票 - 消費品') || cat.includes('行業股票-消費品')) return findCategory('Sector - Consumer & Brands');
+  if (cat.includes('產業股票 - 金融服務') || cat.includes('行業股票-金融服務')) return findCategory('Sector - Financials');
+  if (cat.includes('產業股票 - 公用事業') || cat.includes('行業股票-公用事業')) return findCategory('Sector - Utilities');
+  if (cat.includes('產業股票 - 基礎建設') || cat.includes('行業股票-基礎建設')) return findCategory('Sector - Infrastructure');
+  if (cat.includes('產業股票 - 農產品') || cat.includes('行業股票-農產品')) return findCategory('Sector - Agriculture');
   if (cat.includes('房地產')) return findCategory('Sector - Real Estate');
 
   // --- Balanced / Multi-Asset ---
@@ -138,16 +139,17 @@ const categorize = (morningstarCategory, investmentRegion) => {
   if (cat.includes('貨幣市場') || cat === 'USD Ultra Short-Term Bond') return findCategory('USD Short-Term / Money Market');
 
   // --- Bond categories ---
-  if (cat.includes('可轉換債券')) return findCategory('Convertible Bond');
+  if (cat.includes('可轉換債券') || cat.includes('可換股債券') || cat === 'Convertibles') return findCategory('Convertible Bond');
 
   // High yield
   if (cat === '美元高收益債券') return findCategory('USD High Yield Bond');
-  if (cat.includes('全球高收益債券')) return findCategory('Global High Yield Bond');
-  if (cat.includes('亞洲高收益債券')) return findCategory('Asia Bond');
+  if (cat.includes('全球高收益債券') || cat.includes('環球高收益債券')) return findCategory('Global High Yield Bond');
+  if (cat.includes('亞洲高收益債券') || cat.includes('大中華高收益債券')) return findCategory('Asia Bond');
 
   // EM debt
-  if (cat.includes('全球新興市場債券') && cat.includes('當地貨幣')) return findCategory('EM Debt - Local Currency');
-  if (cat.includes('全球新興市場債券') || cat.includes('全球新興市場企業債券')) return findCategory('EM Debt - Hard Currency');
+  // Morningstar renamed 全球 → 環球 and 當地貨幣 → 本地貨幣 in ~May 2026
+  if ((cat.includes('全球新興市場債券') || cat.includes('環球新興市場債券')) && (cat.includes('當地貨幣') || cat.includes('本地貨幣'))) return findCategory('EM Debt - Local Currency');
+  if (cat.includes('全球新興市場債券') || cat.includes('全球新興市場企業債券') || cat.includes('環球新興市場債券') || cat.includes('環球新興市場企業債券')) return findCategory('EM Debt - Hard Currency');
 
   // Asia bond
   if (cat.includes('亞洲債券') || cat.includes('伊斯蘭債券')) return findCategory('Asia Bond');
@@ -165,7 +167,8 @@ const categorize = (morningstarCategory, investmentRegion) => {
   }
 
   // --- Alternative ---
-  if (cat.includes('Macro') || cat.includes('Multistrategy') || cat.includes('多元化新興市場')) return findCategory('Alternative / Multi-Strategy');
+  // Morningstar switched to Chinese labels 宏觀策略/多元策略 in ~May 2026
+  if (cat.includes('Macro') || cat.includes('Multistrategy') || cat.includes('多元化新興市場') || cat.includes('宏觀策略') || cat.includes('多元策略')) return findCategory('Alternative / Multi-Strategy');
 
   // --- Regional equity (broadest patterns last) ---
   // US
