@@ -31,6 +31,7 @@ const CATEGORIES = [
   { name: 'Sector - Utilities', macro: 'Equity - Sector' },
   { name: 'Sector - Infrastructure', macro: 'Equity - Sector' },
   { name: 'Sector - Agriculture', macro: 'Equity - Sector' },
+  { name: 'Sector - Water Resources', macro: 'Equity - Sector' },
 
   // BOND (11)
   { name: 'USD Investment Grade Bond', macro: 'Bond - IG' },
@@ -126,13 +127,16 @@ const categorize = (morningstarCategory, investmentRegion) => {
   if (cat.includes('產業股票 - 公用事業') || cat.includes('行業股票-公用事業')) return findCategory('Sector - Utilities');
   if (cat.includes('產業股票 - 基礎建設') || cat.includes('行業股票-基礎建設')) return findCategory('Sector - Infrastructure');
   if (cat.includes('產業股票 - 農產品') || cat.includes('行業股票-農產品')) return findCategory('Sector - Agriculture');
-  if (cat.includes('房地產')) return findCategory('Sector - Real Estate');
+  if (cat.includes('行業股票-水資源')) return findCategory('Sector - Water Resources');
+  if (cat.includes('房地產') || cat === 'Real Estate') return findCategory('Sector - Real Estate');
 
   // --- Balanced / Multi-Asset ---
-  if (cat.includes('保守型股債混合')) return findCategory('USD Balanced - Conservative');
+  // TWD-denominated balanced funds (新台幣*) are excluded upstream by the USD-only fund fetch filter.
+  if (cat.includes('保守型股債混合') && cat.includes('美元')) return findCategory('USD Balanced - Conservative');
   if (cat.includes('平衡型股債混合') && cat.includes('美元')) return findCategory('USD Balanced - Moderate');
-  if (cat.includes('積極型股債混合') || (cat.includes('靈活型股債混合') && cat.includes('美元'))) return findCategory('USD Balanced - Aggressive');
-  if (cat.includes('亞洲股債混合') || cat.includes('全球新興市場股債混合')) return findCategory('Asia Balanced');
+  // 進取型 = aggressive/growth (synonym of 積極型, used in newer Morningstar labels)
+  if ((cat.includes('積極型股債混合') || cat.includes('進取型股債混合')) && cat.includes('美元') || (cat.includes('靈活型股債混合') && cat.includes('美元'))) return findCategory('USD Balanced - Aggressive');
+  if (cat.includes('亞洲股債混合') || cat.includes('全球新興市場股債混合') || cat.includes('環球新興市場股債混合')) return findCategory('Asia Balanced');
   if (cat.includes('歐元') && cat.includes('股債混合')) return findCategory('Global Balanced (non-USD hedged)');
 
   // --- Money Market ---
@@ -193,7 +197,7 @@ const categorize = (morningstarCategory, investmentRegion) => {
   if (cat.includes('日本') || cat.includes('Japan')) return findCategory('Japan Equity');
 
   // Europe
-  if (cat.includes('歐洲') || cat.includes('歐元區') || cat.includes('UK ')) return findCategory('Europe Equity');
+  if (cat.includes('歐洲') || cat.includes('歐元區') || cat.includes('英國') || cat.includes('德國') || cat.includes('UK ')) return findCategory('Europe Equity');
 
   // EM broad
   if (cat.includes('新興市場') || cat.includes('Emerging') || cat.includes('邊境')) return findCategory('EM Equity');
