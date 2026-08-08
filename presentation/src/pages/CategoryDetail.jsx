@@ -57,20 +57,26 @@ const CategoryDetail = () => {
       </section>
 
       {siblings.length > 0 && (
-        <section className="siblings">
+        <section className="siblings" data-open={showSiblings}>
           <button
             className="siblings-toggle"
             onClick={() => setShowSiblings(!showSiblings)}
+            aria-expanded={showSiblings}
           >
             {showSiblings ? 'Hide' : 'Show'} {siblings.length} share class variants
+            <span className="t-acc-chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M4 6.5L8 10.5L12 6.5" />
+              </svg>
+            </span>
           </button>
-          {showSiblings && (
-            <div className="siblings-list">
+          <div className="t-acc-panel">
+            <div className="t-acc-panel-inner siblings-list">
               {siblings.map(fund => (
                 <FundCard key={fund.id} fund={fund} dimmed />
               ))}
             </div>
-          )}
+          </div>
         </section>
       )}
     </div>

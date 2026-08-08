@@ -68,7 +68,7 @@ const FundCard = ({ fund, dimmed = false }) => {
         </div>
         <div className="fund-details">
           <span>{fund.riskLevel || '-'}</span>
-          {fund.starRating != null && <span>{renderStars(fund.starRating)}</span>}
+          {fund.starRating != null && <span className="star-rating">{renderStars(fund.starRating)}</span>}
           <span data-testid="yield">
             {fund.currentYield != null ? `${fund.currentYield.toFixed(2)}%` : '-'}
           </span>

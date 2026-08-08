@@ -77,14 +77,21 @@ describe('CategoryDetail', () => {
 
   it('siblings section starts collapsed', () => {
     renderWithRoute();
-    expect(screen.queryByText('\u540c\u985e\u57fa\u91d1C(\u6708\u914d)')).not.toBeInTheDocument();
-    expect(screen.queryByText('\u540c\u985e\u57fa\u91d1D(\u907f\u96aa)')).not.toBeInTheDocument();
+    const toggle = screen.getByRole('button', { name: /share class/i });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle.closest('.siblings')).toHaveAttribute('data-open', 'false');
   });
 
   it('toggles sibling visibility on click', () => {
     renderWithRoute();
     const toggle = screen.getByRole('button', { name: /share class/i });
     fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle.closest('.siblings')).toHaveAttribute('data-open', 'true');
+    expect(screen.getByText(/Hide 2 share class variants/)).toBeInTheDocument();
+    // The accordion keeps sibling content mounted at all times (grid-rows
+    // height animation needs it measurable) \u2014 presence alone no longer
+    // signals expanded state, so we assert on the actual fund content too.
     expect(screen.getByText('\u540c\u985e\u57fa\u91d1C(\u6708\u914d)')).toBeInTheDocument();
     expect(screen.getByText('\u540c\u985e\u57fa\u91d1D(\u907f\u96aa)')).toBeInTheDocument();
   });

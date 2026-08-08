@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import NavGraphThumb from '../components/NavGraphThumb';
 
 describe('NavGraphThumb', () => {
@@ -26,27 +26,59 @@ describe('NavGraphThumb', () => {
     expect(imgs[1]).toHaveClass('nav-graph-modal-image');
   });
 
-  it('closes modal when backdrop is clicked', () => {
-    render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
-    fireEvent.click(screen.getByAltText('NAV trend for X'));
-    fireEvent.click(screen.getByRole('dialog'));
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
+  describe('closing (animated — delayed unmount via is-closing)', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
 
-  it('closes modal when the magnified image itself is clicked (event bubbles to backdrop)', () => {
-    render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
-    fireEvent.click(screen.getByAltText('NAV trend for X'));
-    const imgs = screen.getAllByAltText('NAV trend for X');
-    fireEvent.click(imgs[1]);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
 
-  it('closes modal when Escape key is pressed', () => {
-    render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
-    fireEvent.click(screen.getByAltText('NAV trend for X'));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    fireEvent.keyDown(window, { key: 'Escape' });
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    it('marks the dialog is-closing immediately, before it is removed', () => {
+      render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
+      fireEvent.click(screen.getByAltText('NAV trend for X'));
+      fireEvent.click(screen.getByRole('dialog'));
+      expect(screen.getByRole('dialog')).toHaveClass('is-closing');
+    });
+
+    it('closes modal when backdrop is clicked', () => {
+      render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
+      fireEvent.click(screen.getByAltText('NAV trend for X'));
+      fireEvent.click(screen.getByRole('dialog'));
+      act(() => vi.advanceTimersByTime(200));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes modal when the magnified image itself is clicked (event bubbles to backdrop)', () => {
+      render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
+      fireEvent.click(screen.getByAltText('NAV trend for X'));
+      const imgs = screen.getAllByAltText('NAV trend for X');
+      fireEvent.click(imgs[1]);
+      act(() => vi.advanceTimersByTime(200));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes modal when Escape key is pressed', () => {
+      render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
+      fireEvent.click(screen.getByAltText('NAV trend for X'));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      fireEvent.keyDown(window, { key: 'Escape' });
+      act(() => vi.advanceTimersByTime(200));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('reopening while closing cancels the pending unmount and shows the dialog again', () => {
+      render(<NavGraphThumb base64="abc" alt="NAV trend for X" />);
+      const thumb = screen.getByAltText('NAV trend for X');
+      fireEvent.click(thumb);
+      fireEvent.click(screen.getByRole('dialog')); // starts closing
+      fireEvent.click(thumb); // reopen before the timer fires
+      act(() => vi.advanceTimersByTime(200)); // the old close timer, if not cancelled, would fire here
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).not.toHaveClass('is-closing');
+    });
   });
 
   it('thumbnail click stops propagation so parent link does not navigate', () => {
