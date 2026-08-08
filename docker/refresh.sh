@@ -35,10 +35,15 @@ log "Step 3/6: Merging and categorizing funds..."
 node "$APP_DIR/research/merge-output/index.js"
 log "Step 3/6: Merge complete."
 
-# Step 4: Copy snapshot
+# Step 4: Fold today's NAVs into the long-term series and write the snapshot
 TODAY=$(date +%Y-%m-%d)
 mkdir -p "$SNAPSHOTS_DIR"
-cp "$APP_DIR/research/merge-output/output/merged-funds.json" "$SNAPSHOTS_DIR/$TODAY.json"
+log "Step 4/6: Updating NAV history and writing snapshot..."
+node "$APP_DIR/docker/nav-history.mjs" \
+  "$SNAPSHOTS_DIR/nav-series.json" \
+  "$APP_DIR/research/merge-output/output/merged-funds.json" \
+  "$SNAPSHOTS_DIR/$TODAY.json" \
+  "$TODAY"
 log "Step 4/6: Snapshot saved as $TODAY.json"
 
 # Step 5: Retention cleanup
