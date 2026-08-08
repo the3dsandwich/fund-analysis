@@ -9,3 +9,6 @@ research/merge-output/output/
 # Presentation build artifacts
 presentation/src/data.js
 presentation/dist/
+
+# Synthetic local-preview data (presentation/demo-data/generate.mjs) — never real
+presentation/public/
