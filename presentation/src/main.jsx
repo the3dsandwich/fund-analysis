@@ -5,6 +5,7 @@ import { DataProvider } from './contexts/DataContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import CategoryList from './pages/CategoryList';
 import CategoryDetail from './pages/CategoryDetail';
+import CategoryRail from './components/CategoryRail';
 import Sidebar from './components/Sidebar';
 import DateGate from './components/DateGate';
 import RedirectToLatest from './components/RedirectToLatest';
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
       <DataProvider>
         <HashRouter>
           <div className="app-layout">
+            <CategoryRail />
             <div className="main-content">
               <Routes>
                 <Route path="/" element={<RedirectToLatest />} />

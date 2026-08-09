@@ -108,6 +108,21 @@ body {
 
 .container {
   max-width: 1000px;
+  /* Route changes fully remount CategoryList/CategoryDetail (both share this
+     class) — a plain mount-triggered animation is enough, no exit-transition
+     orchestration needed since React Router already unmounts the old page. */
+  animation: content-fade-in var(--duration-fast) var(--ease-smooth-out);
+}
+
+@keyframes content-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 h1 {
@@ -172,6 +187,82 @@ h1 {
   border-bottom: 2px solid var(--color-divider);
   padding-bottom: var(--space-2);
   margin-bottom: var(--space-3);
+}
+
+/* Category nav rail — persistent left column, all categories, always visible.
+   Deliberately borderless/flat against the page (just a divider on the
+   right) rather than boxed like .sidebar: this is primary navigation chrome,
+   not a secondary utility panel, so it shouldn't read as its own "card". */
+.category-rail {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--space-5);
+  align-self: flex-start;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-right: var(--space-4);
+  border-right: 1px solid var(--color-divider);
+}
+
+.rail-section {
+  margin-bottom: var(--space-4);
+}
+
+.rail-section-title {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.05em;
+  padding: 0 var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.rail-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid transparent;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  transition:
+    background     var(--duration-quick) var(--ease-smooth-out),
+    color          var(--duration-quick) var(--ease-smooth-out),
+    border-color   var(--duration-quick) var(--ease-smooth-out);
+}
+
+.rail-link:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.rail-link-active {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  border-left-color: var(--color-accent);
+}
+
+.rail-link-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-thin-dot {
+  flex-shrink: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  opacity: 0.6;
 }
 
 /* Category cards on list page */
@@ -714,6 +805,15 @@ a.fund-name:hover {
 }
 
 /* Responsive */
+/* Rail goes first — three sticky columns need more room than the existing
+   768px mobile breakpoint (below) gives; below 768px, everything falls back
+   to exactly today's behavior (rail was never there to begin with). */
+@media (max-width: 1024px) {
+  .category-rail {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .app-layout {
     flex-direction: column;
@@ -749,11 +849,13 @@ a.fund-name:hover {
   .star-btn,
   .nav-graph-thumb,
   .sidebar-compact-link,
-  .snapshot-picker {
+  .snapshot-picker,
+  .rail-link {
     transition: none !important;
   }
 
-  .star-btn-active {
+  .star-btn-active,
+  .container {
     animation: none !important;
   }
 

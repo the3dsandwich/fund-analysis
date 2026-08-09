@@ -4,19 +4,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import SnapshotPicker from '../components/SnapshotPicker';
 import StarButton from '../components/StarButton';
 import NavGraphThumb from '../components/NavGraphThumb';
-
-const groupByMacro = (categorySummary) => {
-  const grouped = [];
-  let current = null;
-  for (const cat of categorySummary) {
-    if (!current || current.macro !== cat.macro) {
-      current = { macro: cat.macro, categories: [] };
-      grouped.push(current);
-    }
-    current.categories.push(cat);
-  }
-  return grouped;
-};
+import { groupByMacro } from '../utils/groupByMacro';
 
 const getTopRep = (data, categoryName) => {
   const cat = data.categories[categoryName];
