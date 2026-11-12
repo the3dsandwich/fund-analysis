@@ -2,34 +2,38 @@ services:
   fund-analysis:
     image: ghcr.io/the3dsandwich/fund-analysis:latest
     ports:
-      - "${PORT:-3000}:80"
+    - ${PORT:-3000}:80
     environment:
-      - REFRESH_HOUR=${REFRESH_HOUR:-2}
-      - REFRESH_MINUTE=${REFRESH_MINUTE:-0}
-      - TZ=${TZ:-Asia/Taipei}
+    - REFRESH_HOUR=${REFRESH_HOUR:-2}
+    - REFRESH_MINUTE=${REFRESH_MINUTE:-0}
+    - TZ=${TZ:-Asia/Taipei}
     volumes:
-      - snapshots:/data/snapshots
+    - type: bind
+      source: ${APP_DATA_ROOT:?Set APP_DATA_ROOT}/snapshots
+      target: /data/snapshots
+      bind:
+        create_host_path: false
     labels:
-      - com.centurylinklabs.watchtower.enable=true
-      - com.centurylinklabs.watchtower.scope=fund-analysis
+    - com.centurylinklabs.watchtower.enable=true
+    - com.centurylinklabs.watchtower.scope=fund-analysis
     restart: unless-stopped
-
-
   watchtower:
     image: nickfedor/watchtower:1.24.0
     container_name: watchtower-fund-analysis
     environment:
-      - TZ=${TZ:-Asia/Taipei}
-      - WATCHTOWER_SCOPE=fund-analysis
-      - WATCHTOWER_LABEL_ENABLE=true
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=60
+    - TZ=${TZ:-Asia/Taipei}
+    - WATCHTOWER_SCOPE=fund-analysis
+    - WATCHTOWER_LABEL_ENABLE=true
+    - WATCHTOWER_CLEANUP=true
+    - WATCHTOWER_POLL_INTERVAL=60
     labels:
-      - com.centurylinklabs.watchtower.scope=fund-analysis
-      - com.centurylinklabs.watchtower.enable=false
+    - com.centurylinklabs.watchtower.scope=fund-analysis
+    - com.centurylinklabs.watchtower.enable=false
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    - type: bind
+      source: ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}
+      target: /var/run/docker.sock
+      bind:
+        create_host_path: false
     restart: unless-stopped
-
-volumes:
-  snapshots:
+name: fund-analysis
